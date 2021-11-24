@@ -22,7 +22,7 @@ CEC_Device::CEC_Device(int physicalAddress, int in_line, int out_line)
 void CEC_Device::Initialize(CEC_DEVICE_TYPE type)
 {
 #ifdef STM32
-  gpio_set_mode(digitalPinToPort(_in_line), PIN_MAP[_in_line].gpio_bit, GPIO_OUTPUT_OD); // set open drain output
+  pinMode(_in_line, OUTPUT_OPEN_DRAIN);
   _out_line = _in_line;
 #else
   pinMode(_out_line, OUTPUT);
@@ -39,7 +39,7 @@ void CEC_Device::OnReady()
 {
   // This is called after the logical address has been
   // allocated
-  DbgPrint("Device ready\n");
+  DbgPrint("Device ready\r\n");
 }
 
 void CEC_Device::OnReceive(int source, int dest, unsigned char* buffer, int count)
@@ -47,10 +47,11 @@ void CEC_Device::OnReceive(int source, int dest, unsigned char* buffer, int coun
   // This is called when a frame is received.  To transmit
   // a frame call TransmitFrame.  To receive all frames, even
   // those not addressed to this device, set Promiscuous to true.
-  DbgPrint("Packet received at %ld: %02d -> %02d: %02X", millis(), source, dest, ((source&0x0f)<<4)|(dest&0x0f));
+  DbgPrint("Packet received at %ld: %02d -> %02d: %02X \r\n", millis(), source, dest, ((source&0x0f)<<4)|(dest&0x0f));
+  DbgPrint("Packet:\r\n");
   for (int i = 0; i < count; i++)
-    DbgPrint(":%02X", buffer[i]);
-  DbgPrint("\n");
+    DbgPrint("0x%02X ", buffer[i]);
+  DbgPrint("\r\n");
 }
 
 bool CEC_Device::LineState()
